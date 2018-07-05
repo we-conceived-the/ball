@@ -31,6 +31,8 @@ for(int i = 0; i < targets.size(); i++) {
         "JOB_NUMBER=${BUILD_NUMBER}",
       ]
       withEnv(env) {
+        sh "docker rm -fv gitian-target || true"
+        
         def builderImageName="dash-builder-${target}"
 
         def builderImage

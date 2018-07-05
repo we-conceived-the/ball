@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 
+# This script is executed inside the builder image
+
 set -e
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ./ci/matrix.sh
 
-source $DIR/matrix.sh
+if [ "$RUN_TESTS" != "true" ]; then
+  echo "Skipping integration tests"
+  exit 0
+fi
 
-$DOCKER_RUN_IN_BUILDER ./ci/test_integrationtests_in_builder.sh
+export LD_LIBRARY_PATH=$BUILD_DIR/depends/$HOST/lib
+
+cd build-ci/dashcore-$BUILD_TARGET
+
+./qa/pull-tester/rpc-tests.py --coverage

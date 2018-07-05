@@ -46,16 +46,16 @@ node {
           builderImage.inside("-t -v \"$HOME/dash-ci-cache-${target}:/cache\"") {
             try {
               stage("${target}/depends") {
-                sh './ci/build_depends_in_builder.sh'
+                sh './ci/build_depends.sh'
               }
               stage("${target}/build") {
-                sh './ci/build_src_in_builder.sh'
+                sh './ci/build_src.sh'
               }
               stage("${target}/test") {
-                sh './ci/test_unittests_in_builder.sh'
+                sh './ci/test_unittests.sh'
               }
               stage("${target}/test") {
-                sh './ci/test_integrationtests_in_builder.sh'
+                sh './ci/test_integrationtests.sh'
               }
             } finally {
               // TODO cleanup

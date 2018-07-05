@@ -66,10 +66,10 @@ before_script:
 script:
     - export TRAVIS_COMMIT_LOG=`git log --format=fuller -1`
     # Our scripts try to be Travis agnostic
-    - $DOCKER_RUN_IN_BUILDER ./ci/build_depends_in_builder.sh
-    - $DOCKER_RUN_IN_BUILDER ./ci/build_src_in_builder.sh
-    - travis_wait 30 $DOCKER_RUN_IN_BUILDER ./ci/test_unittests_in_builder.sh
-    - $DOCKER_RUN_IN_BUILDER ./ci/test_integrationtests_in_builder.sh
+    - $DOCKER_RUN_IN_BUILDER ./ci/build_depends.sh
+    - $DOCKER_RUN_IN_BUILDER ./ci/build_src.sh
+    - travis_wait 30 $DOCKER_RUN_IN_BUILDER ./ci/test_unittests.sh
+    - $DOCKER_RUN_IN_BUILDER ./ci/test_integrationtests.sh
     - if [ "$DOCKER_BUILD" = "true" ]; then BUILD_DIR=build-ci/dashcore-$BUILD_TARGET ./docker/build-docker.sh; fi
 after_script:
     - echo $TRAVIS_COMMIT_RANGE

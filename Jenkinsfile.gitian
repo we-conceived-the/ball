@@ -7,6 +7,8 @@ node {
 
   def osslTarUrl = 'http://downloads.sourceforge.net/project/osslsigncode/osslsigncode/osslsigncode-1.7.1.tar.gz'
   def osslPatchUrl = 'https://bitcoincore.org/cfields/osslsigncode-Backports-to-1.7.1.patch'
+  def SDK_URL='https://bitcoincore.org/depends-sources/sdks'
+  def OSX_SDK='10.11'
   def proc = 4
   def mem = 2000
 
@@ -29,6 +31,12 @@ node {
             git url: 'https://github.com/dashpay/gitian-builder.git'
           }
           sh "mkdir -p dashcore-binaries"
+          if (target == "mac") {
+            dir('gitian-builder') {
+              sh 'mkdir -p inputs'
+              sh "curl --location --fail $SDK_URL/MacOSX${OSX_SDK}.sdk.tar.gz -o inputs/MacOSX${OSX_SDK}.sdk.tar.gz"
+            }
+          }
         }
 
         def gitianImage

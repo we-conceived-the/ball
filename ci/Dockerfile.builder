@@ -33,7 +33,7 @@ RUN useradd -u ${USER_ID} -g dash -s /bin/bash -m -d /dash dash
 # Extra packages
 ARG BUILD_TARGET=linux68
 ADD matrix.sh /tmp/matrix.sh
-RUN source /tmp/matrix.sh && \
+RUN . /tmp/matrix.sh && \
   if [ -n "$DPKG_ADD_ARCH" ]; then dpkg --add-architecture "$DPKG_ADD_ARCH" ; fi && \
   if [ -n "$PACKAGES" ]; then apt-get update && apt-get install -y --no-install-recommends --no-upgrade $PACKAGES && rm -rf /var/lib/apt/lists; fi
 

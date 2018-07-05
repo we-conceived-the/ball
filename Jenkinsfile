@@ -34,7 +34,7 @@ node {
           }
 
           builderImage.inside("-u root -t -v $HOME:/host-home") {
-            sh "rm -rf /host/home/dash-ci-cache-${target}"
+            sh "rm -rf /host-home/dash-ci-cache-${target}"
           }
           sh 'mkdir -p $HOME/dash-ci-cache-${target}'
 

@@ -12,7 +12,8 @@ unset DISPLAY
 export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
 export CCACHE_SIZE=${CCACHE_SIZE:-400M}
 
-echo BUILD_TARGET=$BUILD_TARGET
+env
+
 set +e
 ls -lah
 ls -lah depends
@@ -20,8 +21,6 @@ ls -lah depends/built/
 ls -lah /cache
 ls -lah /cache/depends
 find /cache/depends
-ls -lah depends/i686-w64-mingw32
-find depends/i686-w64-mingw32
 set -e
 
 #if [ "$CHECK_DOC" = 1 ]; then contrib/devtools/check-doc.py; fi TODO reenable after all Bitcoin PRs have been merged and docs fully fixed

@@ -162,7 +162,7 @@ bool CMasternodeMan::PoSeBan(const COutPoint &outpoint)
 void CMasternodeMan::Check()
 {
     LOCK2(cs_main, cs);
-    
+
     for (auto& mnpair : mapMasternodes) {
         // NOTE: internally it checks only every MASTERNODE_CHECK_SECONDS seconds
         // since the last time, so expect some MNs to skip this

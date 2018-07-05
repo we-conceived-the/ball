@@ -13,6 +13,8 @@ set +e
 ls -lah $CACHE_DIR
 ls -lah $CACHE_DIR/depends
 ls -lah $CACHE_DIR/sdk-sources
+docker ps
+ls -lah /var/run/docker.sock
 set -e
 
 mkdir -p $CACHE_DIR/depends

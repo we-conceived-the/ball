@@ -34,7 +34,7 @@ node {
 
           def builderImage
           stage("${target}/builder-image") {
-            builderImage = docker.build("${builderImageName}", "ci -f ci/Dockerfile.builder --build-arg USER_ID=${UID} --build-arg GROUP_ID=${UID}")
+            builderImage = docker.build("${builderImageName}", "--build-arg USER_ID=${UID} --build-arg GROUP_ID=${UID} ci -f ci/Dockerfile.builder")
           }
 
           builderImage.inside("-u ${UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {

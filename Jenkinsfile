@@ -16,7 +16,7 @@ node {
     tasks["${target}"] = {
       node {
         def BUILD_NUMBER = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
-        sh "BUILD_NUMBER=${BUILD_NUMBER}"
+        def UID = sh(returnStdout: true, script: 'echo $UID').trim()
 
         def env = [
           "BUILD_TARGET=${target}",
@@ -34,10 +34,10 @@ node {
 
           def builderImage
           stage("${target}/builder-image") {
-            builderImage = docker.build("${builderImageName}", "ci -f ci/Dockerfile.builder --build-arg USER_ID=${env.UID} --build-arg GROUP_ID=${env.UID}")
+            builderImage = docker.build("${builderImageName}", "ci -f ci/Dockerfile.builder --build-arg USER_ID=${UID} --build-arg GROUP_ID=${UID}")
           }
 
-          builderImage.inside("-u ${env.UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {
+          builderImage.inside("-u ${UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {
             try {
               stage("${target}/depends") {
                 sh 'pwd && ls -lah'

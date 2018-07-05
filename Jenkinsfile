@@ -2,11 +2,11 @@ node {
   def targets = [
     'win32',
     'win64',
-    'linux32',
-    'linux64',
-    'linux64_nowallet',
-    'linux64_release',
-    'mac',
+    //'linux32',
+    //'linux64',
+    //'linux64_nowallet',
+    //'linux64_release',
+    //'mac',
   ]
 
   def tasks = [:]
@@ -17,44 +17,42 @@ node {
       "BUILD_TARGET=${target}",
       "PULL_REQUEST=false",
       "JOB_NUMBER=${env.BUILD_NUMBER}",
-      "USE_VOLUMES_FOR_CACHE=true",
     ]
 
     tasks["${target}"] = {
       withEnv(env) {
-        stage("${target}/checkout") {
-          node {
-            checkout scm
-          }
-        }
+        node {
+          def builderImageName="dash-builder-${target}-${env.BUILD_NUMBER}"
 
-        stage("${target}/build") {
-          node {
-            try {
-              sh './ci/build_builder.sh'
-              sh './ci/make_volumes.sh'
-              sh './ci/build_depends.sh'
-              sh './ci/build_src.sh'
-            } catch(err) {
-              sh './ci/cleanup_docker.sh'
-              throw err
+          stage("${target}/checkout") {
+            node {
+              checkout scm
             }
           }
-        }
-        stage("${target}/test") {
-          node {
-            try {
-              sh './ci/test_unittests.sh'
-              sh './ci/test_integrationtests.sh'
-              sh './ci/cleanup_docker.sh'
-            } catch(err) {
-              sh './ci/cleanup_docker.sh'
-            }
+
+          def builderImage
+          stage("${target}/builder-image") {
+            builderImage = docker.build("${builderImageName}", "ci -f ci/Dockerfile.builder --build-arg USER_ID=${env.UID} --build-arg GROUP_ID=${env.UID}")
           }
-        }
-        stage("${target}/cleanup") {
-          node {
-            sh './ci/cleanup_docker.sh'
+
+          builderImage.inside("-u ${env.UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {
+            try {
+              stage("${target}/depends") {
+                sh 'pwd && ls -lah'
+                sh './ci/build_depends_in_builder.sh'
+              }
+              stage("${target}/build") {
+                sh './ci/build_src_in_builder.sh'
+              }
+              stage("${target}/test") {
+                sh './ci/test_unittests_in_builder.sh'
+              }
+              stage("${target}/test") {
+                sh './ci/test_integrationtests_in_builder.sh'
+              }
+            } finally {
+              // TODO cleanup
+            }
           }
         }
       }

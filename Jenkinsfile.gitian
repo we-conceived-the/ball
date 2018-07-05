@@ -63,11 +63,16 @@ for(int i = 0; i < targets.size(); i++) {
         }
         stage("${target}/gbuild") {
           dir('gitian-builder') {
-            sh """
-              tail -F var/install.log &
-              tail -F var/build.log &
-              USE_DOCKER=1 ./bin/gbuild -j ${proc} -m ${mem} --commit dash=${commit} --url dash=${repositoryUrl} ../dash/contrib/gitian-descriptors/gitian-${target}.yml
-            """
+            try {
+              sh """
+                tail -F var/install.log &
+                tail -F var/build.log &
+                USE_DOCKER=1 ./bin/gbuild -j ${proc} -m ${mem} --commit dash=${commit} --url dash=${repositoryUrl} ../dash/contrib/gitian-descriptors/gitian-${target}.yml
+              """
+            } finally {
+              // make sure it doesn't run forever
+              sh "docker rm -fv gitian-target || true"
+            }
             sh "mv build/out/src/dashcore-* ../dashcore-binaries/"
             stash includes: '**/build/out/dashcore-*', name: target
           }

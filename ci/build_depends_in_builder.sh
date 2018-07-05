@@ -9,6 +9,15 @@ source ./ci/matrix.sh
 unset CC; unset CXX
 unset DISPLAY
 
+set +e
+ls -lah $CACHE_DIR
+ls -lah $CACHE_DIR/depends
+ls -lah $CACHE_DIR/sdk-sources
+set -e
+
+mkdir -p $CACHE_DIR/depends
+mkdir -p $CACHE_DIR/sdk-sources
+
 ln -s $CACHE_DIR/depends depends/built
 ln -s $CACHE_DIR/sdk-sources depends/sdk-sources
 

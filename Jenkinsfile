@@ -26,7 +26,7 @@ node {
           "JOB_NUMBER=${BUILD_NUMBER}",
         ]
         withEnv(env) {
-          def builderImageName="dash-builder-${target}-${BUILD_NUMBER}"
+          def builderImageName="dash-builder-${target}"
 
           def builderImage
           stage("${target}/builder-image") {
@@ -36,7 +36,6 @@ node {
           builderImage.inside("-u ${UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {
             try {
               stage("${target}/depends") {
-                sh 'pwd && ls -lah'
                 sh './ci/build_depends_in_builder.sh'
               }
               stage("${target}/build") {

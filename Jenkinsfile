@@ -37,7 +37,7 @@ node {
             sh "chown dash:dash /cache"
           }
 
-          builderImage.inside("-t -v \"$HOME/dash-ci-cache-${target}:/cache"\") {
+          builderImage.inside("-t -v \"$HOME/dash-ci-cache-${target}:/cache\"") {
             try {
               stage("${target}/depends") {
                 sh './ci/build_depends_in_builder.sh'

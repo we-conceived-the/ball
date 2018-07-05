@@ -1,3 +1,9 @@
+// This Jenkinsfile will build a builder image and then run the actual build and tests inside this image
+// It's very important to not execute any scripts outside of the builder container, as it's our protection against
+// external developers bringing in harmful code into Jenkins.
+// Jenkins will only run the build if this Jenkinsfile was not modified in an external pull request. Only branches
+// which are part of the Dash repo will allow modification to the Jenkinsfile.
+
 node {
   def targets = [
     'win32',

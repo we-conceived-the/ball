@@ -33,10 +33,9 @@ node {
             builderImage = docker.build("${builderImageName}", "--build-arg USER_ID=${UID} --build-arg GROUP_ID=${UID} --build-arg BUILD_TARGET=${target} ci -f ci/Dockerfile.builder")
           }
 
-          builderImage.inside("-u root -t -v $HOME:/host-home") {
-            sh "rm -rf /host-home/dash-ci-cache-${target}"
+          builderImage.inside("-u root -t -v $HOME/dash-ci-cache-${target}:/cache") {
+            sh "chown ${UID}:${UID} /cache"
           }
-          sh "mkdir -p $HOME/dash-ci-cache-${target}"
 
           builderImage.inside("-u ${UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {
             try {

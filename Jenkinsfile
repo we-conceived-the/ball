@@ -15,6 +15,8 @@ node {
 
     tasks["${target}"] = {
       node {
+        checkout scm
+
         def BUILD_NUMBER = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
         def UID = sh(returnStdout: true, script: 'id -u').trim()
 
@@ -25,12 +27,6 @@ node {
         ]
         withEnv(env) {
           def builderImageName="dash-builder-${target}-${BUILD_NUMBER}"
-
-          stage("${target}/checkout") {
-            node {
-              checkout scm
-            }
-          }
 
           def builderImage
           stage("${target}/builder-image") {

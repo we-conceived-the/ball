@@ -14,15 +14,15 @@ def mem = 2000
 def repositoryUrl = "https://github.com/dashpay/dash.git"
 def commit = "develop"
 
-try {
-  for(int i = 0; i < targets.size(); i++) {
-    def target = targets[i]
+def tasks = [:]
+for(int i = 0; i < targets.size(); i++) {
+  def target = targets[i]
 
-    // TODO run this in parallel (requires non-ECS agents)
+  tasks["${target}"] = {
     node {
       def pwd = sh(returnStdout: true, script: 'pwd').trim()
       def dockerGid = sh(returnStdout: true, script: "stat -c '%g' /var/run/docker.sock").trim()
-      stage("${target}/checkout") {
+      stage("${target}/prepare") {
         dir('dash') {
           checkout scm
         }
@@ -69,13 +69,26 @@ try {
               USE_DOCKER=1 ./bin/gbuild -j ${proc} -m ${mem} --commit dash=${commit} --url dash=${repositoryUrl} ../dash/contrib/gitian-descriptors/gitian-${target}.yml
             """
             sh "mv build/out/src/dashcore-* ../dashcore-binaries/"
+            stash includes: '**/build/out/dashcore-*', name: target
           }
         }
       }
     }
   }
+}
+
+try {
+  parallel tasks
 } finally {
-  stage("archive") {
-    archiveArtifacts artifacts: 'dashcore-binaries/*', fingerprint: true
+  node {
+    stage("archive") {
+      for(int i = 0; i < targets.size(); i++) {
+        try {
+          unstash targets[i]
+        } catch (Exception e) {
+        }
+      }
+      archiveArtifacts artifacts: 'dashcore-binaries/*', fingerprint: true
+    }
   }
 }

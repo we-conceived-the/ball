@@ -31,6 +31,7 @@ RUN groupadd -g ${GROUP_ID} dash
 RUN useradd -u ${USER_ID} -g dash -s /bin/bash -m -d /dash dash
 
 # Extra packages
+ARG BUILD_TARGET=linux68
 ADD matrix.sh /tmp/matrix.sh
 RUN source /tmp/matrix.sh && \
   if [ -n "$DPKG_ADD_ARCH" ]; then dpkg --add-architecture "$DPKG_ADD_ARCH" ; fi && \

@@ -12,7 +12,7 @@ export BUILDER_IMAGE_NAME="dash-builder-$BUILD_TARGET-$JOB_NUMBER"
 export HOST_SRC_DIR=${HOST_SRC_DIR:-$(pwd)}
 export HOST_CACHE_DIR=${HOST_CACHE_DIR:-/cache}
 
-export SRC_DIR=/dash-src
+export SRC_DIR=${SRC_DIR:-$HOST_SRC_DIR}
 export BUILD_DIR=$SRC_DIR
 export OUT_DIR=$BUILD_DIR/out
 

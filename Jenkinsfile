@@ -33,11 +33,11 @@ node {
             builderImage = docker.build("${builderImageName}", "--build-arg BUILD_TARGET=${target} ci -f ci/Dockerfile.builder")
           }
 
-          builderImage.inside("-u root -t -v $HOME/dash-ci-cache-${target}:/cache") {
+          builderImage.inside("-u root -t -v \"$HOME/dash-ci-cache-${target}:/cache\"") {
             sh "chown dash:dash /cache"
           }
 
-          builderImage.inside("-t -v $HOME/dash-ci-cache-${target}:/cache") {
+          builderImage.inside("-t -v \"$HOME/dash-ci-cache-${target}:/cache"\") {
             try {
               stage("${target}/depends") {
                 sh './ci/build_depends_in_builder.sh'

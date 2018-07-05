@@ -13,15 +13,14 @@ node {
   for(int i = 0; i < targets.size(); i++) {
     def target = targets[i]
 
-    def env = [
-      "BUILD_TARGET=${target}",
-      "PULL_REQUEST=false",
-      "JOB_NUMBER=" + env.BUILD_NUMBER,
-    ]
-
     tasks["${target}"] = {
-      withEnv(env) {
-        node {
+      node {
+        def env = [
+          "BUILD_TARGET=${target}",
+          "PULL_REQUEST=false",
+          "JOB_NUMBER=" + env.BUILD_NUMBER,
+        ]
+        withEnv(env) {
           def builderImageName="dash-builder-${target}-" + env.BUILD_NUMBER
 
           stage("${target}/checkout") {

@@ -58,7 +58,7 @@ install:
     # Load cached builder image
     - ls -lah $HOST_CACHE_DIR && ls -lah $HOST_CACHE_DIR/docker
     - if [ -f $HOST_CACHE_DIR/docker/dash-builder-$BUILD_TARGET.tar.gz ]; then zcat $HOST_CACHE_DIR/docker/dash-builder-$BUILD_TARGET.tar.gz | docker load || true; fi
-    - docker build --pull -t $BUILDER_IMAGE_NAME --build-target=$BUILD_TARGET -f ci/Dockerfile.builder ci
+    - docker build --pull -t $BUILDER_IMAGE_NAME --build-arg=BUILD_TARGET=$BUILD_TARGET -f ci/Dockerfile.builder ci
 before_script:
     # Make sure stdout is in blocking mode. Otherwise builds will fail due to large writes to stdout
     # See https://github.com/travis-ci/travis-ci/issues/4704. If this gets fixed, this line can also be removed.

@@ -15,13 +15,16 @@ node {
 
     tasks["${target}"] = {
       node {
+        def BUILD_NUMBER = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
+        sh "BUILD_NUMBER=${BUILD_NUMBER}"
+
         def env = [
           "BUILD_TARGET=${target}",
           "PULL_REQUEST=false",
-          "JOB_NUMBER=" + env.BUILD_NUMBER,
+          "JOB_NUMBER=${BUILD_NUMBER}",
         ]
         withEnv(env) {
-          def builderImageName="dash-builder-${target}-" + env.BUILD_NUMBER
+          def builderImageName="dash-builder-${target}-${BUILD_NUMBER}"
 
           stage("${target}/checkout") {
             node {

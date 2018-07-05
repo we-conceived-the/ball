@@ -20,6 +20,8 @@ ls -lah depends/built/
 ls -lah /cache
 ls -lah /cache/depends
 find /cache/depends
+ls -lah /cache/depends/i686-w64-mingw32
+find /cache/depends/i686-w64-mingw32
 set -e
 
 #if [ "$CHECK_DOC" = 1 ]; then contrib/devtools/check-doc.py; fi TODO reenable after all Bitcoin PRs have been merged and docs fully fixed

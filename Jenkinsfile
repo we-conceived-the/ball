@@ -30,14 +30,14 @@ node {
 
           def builderImage
           stage("${target}/builder-image") {
-            builderImage = docker.build("${builderImageName}", "--build-arg USER_ID=${UID} --build-arg GROUP_ID=${UID} --build-arg BUILD_TARGET=${target} ci -f ci/Dockerfile.builder")
+            builderImage = docker.build("${builderImageName}", "--build-arg BUILD_TARGET=${target} ci -f ci/Dockerfile.builder")
           }
 
           builderImage.inside("-u root -t -v $HOME/dash-ci-cache-${target}:/cache") {
-            sh "chown ${UID}:${UID} /cache"
+            sh "chown dash:dash /cache"
           }
 
-          builderImage.inside("-u ${UID} -t -v $HOME/dash-ci-cache-${target}:/cache") {
+          builderImage.inside("-t -v $HOME/dash-ci-cache-${target}:/cache") {
             try {
               stage("${target}/depends") {
                 sh './ci/build_depends_in_builder.sh'

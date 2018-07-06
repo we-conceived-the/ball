@@ -33,19 +33,13 @@ for(int i = 0; i < targets.size(); i++) {
         copyArtifacts(projectName: "dashpay-dash/${BRANCH_NAME}", selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
         hasCache = true
       } catch (Exception e) {
-        def sw = new StringWriter()
-        def pw = new PrintWriter(sw)
-        e.printStackTrace(pw)
-        echo sw.toString()
+        echo e.toString()
 
         try {
           copyArtifacts(projectName: 'dashpay-dash/develop', selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
           hasCache = true
         } catch (Exception e2) {
-          def sw2 = new StringWriter()
-          def pw2 = new PrintWriter(sw2)
-          e2.printStackTrace(pw2)
-          echo sw2.toString()
+          echo e2.toString()
         }
       }
 

@@ -28,6 +28,7 @@ for(int i = 0; i < targets.size(); i++) {
 
       checkout scm
 
+      // restore cache
       def hasCache = false
       try {
         copyArtifacts(projectName: "dashpay-dash/${BRANCH_NAME}", selector: lastSuccessful(), filter: "ci-cache-${target}.tar.gz");
@@ -61,8 +62,6 @@ for(int i = 0; i < targets.size(); i++) {
         } else {
           sh "mkdir -p ${pwd}/ci-cache-${target}"
         }
-        sh "ls -lah"
-        sh "ls -lah ci-cache-${target} || true"
 
         builderImage.inside("-t") {
           try {
@@ -82,8 +81,8 @@ for(int i = 0; i < targets.size(); i++) {
             // TODO cleanup
           }
         }
-        sh "ls -lah"
-        sh "ls -lah ${pwd}/ci-cache-${target} || true"
+
+        // archive cache
         sh "tar czfv ci-cache-${target}.tar.gz ci-cache-${target}"
         archiveArtifacts artifacts: "ci-cache-${target}.tar.gz", fingerprint: true
       }

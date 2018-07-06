@@ -48,13 +48,14 @@ for(int i = 0; i < targets.size(); i++) {
 
       def gitianDescriptor = readYaml file: "dash/contrib/gitian-descriptors/gitian-${target}.yml"
 
+      // restore cache
       def hasCache = false
       try {
-        copyArtifacts(projectName: "dashpay-dash-gitian-nightly/${BRANCH_NAME}", selector: lastSuccessful, filter: "cache-${gitianDescriptor.name}.tar.gz");
+        copyArtifacts(projectName: "dashpay-dash-gitian-nightly/${BRANCH_NAME}", selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
         hasCache = true
       } catch (Exception e) {
         try {
-          copyArtifacts(projectName: 'dashpay-dash-gitian-nightly/develop', selector: lastSuccessful, filter: "cache-${gitianDescriptor.name}.tar.gz");
+          copyArtifacts(projectName: 'dashpay-dash-gitian-nightly/develop', selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
           hasCache = true
         } catch (Exception e2) {
         }
@@ -62,9 +63,10 @@ for(int i = 0; i < targets.size(); i++) {
 
       gitianImage.inside("--group-add ${dockerGid} -t -v \"/var/run/docker.sock:/var/run/docker.sock\"") {
 
-        sh "mkdir -p gitian-builder/cache"
         if (hasCache) {
           sh "cd gitian-builder/cache && tar xzfv ../../cache-${gitianDescriptor.name}.tar.gz"
+        } else {
+          sh "mkdir -p gitian-builder/cache"
         }
 
         stage("${target}/download") {
@@ -97,7 +99,7 @@ for(int i = 0; i < targets.size(); i++) {
             }
             sh "mv build/out/dashcore-* ../dashcore-binaries/"
             sh "mv build/out/src/dashcore-* ../dashcore-binaries/"
-            stash includes: '**/build/out/dashcore-*', name: target
+            archiveArtifacts artifacts: 'dashcore-binaries/*', fingerprint: true
           }
         }
         sh "cd gitian-builder/cache && tar czfv ../../cache-${gitianDescriptor.name}.tar.gz common ${gitianDescriptor.name}"
@@ -107,18 +109,4 @@ for(int i = 0; i < targets.size(); i++) {
   }
 }
 
-try {
-  parallel tasks
-} finally {
-  node {
-    stage("archive") {
-      for(int i = 0; i < targets.size(); i++) {
-        try {
-          unstash targets[i]
-        } catch (Exception e) {
-        }
-      }
-      archiveArtifacts artifacts: 'dashcore-binaries/*', fingerprint: true
-    }
-  }
-}
+parallel tasks

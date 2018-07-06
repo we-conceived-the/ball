@@ -83,7 +83,7 @@ for(int i = 0; i < targets.size(); i++) {
           }
         }
         sh "ls -lah"
-        sh "ls -lah ci-cache-${target} || true"
+        sh "ls -lah ${pwd}/ci-cache-${target} || true"
         sh "tar czfv ci-cache-${target}.tar.gz ci-cache-${target}"
         archiveArtifacts artifacts: "ci-cache-${target}.tar.gz", fingerprint: true
       }

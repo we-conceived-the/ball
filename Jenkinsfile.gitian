@@ -25,6 +25,8 @@ for(int i = 0; i < targets.size(); i++) {
       def BRANCH_NAME = sh(returnStdout: true, script: 'echo $BRANCH_NAME').trim()
       def hasCache = false
 
+      def gitianDescriptor = readYaml file: "dash/contrib/gitian-descriptors/gitian-${target}.yml"
+
       stage("${target}/prepare") {
         dir('dash') {
           checkout scm
@@ -61,8 +63,6 @@ for(int i = 0; i < targets.size(); i++) {
           gitianImage = docker.build("dash-gitian:${env.BUILD_ID}", 'ci -f ci/Dockerfile.gitian-builder')
         }
       }
-
-      def gitianDescriptor = readYaml file: "dash/contrib/gitian-descriptors/gitian-${target}.yml"
 
       gitianImage.inside("--group-add ${dockerGid} -t -v \"/var/run/docker.sock:/var/run/docker.sock\"") {
         if (hasCache) {

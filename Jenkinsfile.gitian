@@ -43,16 +43,13 @@ for(int i = 0; i < targets.size(); i++) {
         }
 
         // restore cache
-        try {
-          copyArtifacts(projectName: "dashpay-dash-gitian-nightly/${BRANCH_NAME}", selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
+        copyArtifacts(projectName: "dashpay-dash-gitian-nightly/${BRANCH_NAME}", optional: true, selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz")
+        if (fileExists("cache-${gitianDescriptor.name}.tar.gz")) {
           hasCache = true
-        } catch (Exception e) {
-          echo e.toString()
-          try {
-            copyArtifacts(projectName: 'dashpay-dash-gitian-nightly/develop', selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
+        } else {
+          copyArtifacts(projectName: 'dashpay-dash-gitian-nightly/develop', optional: true, selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
+          if (fileExists("cache-${gitianDescriptor.name}.tar.gz")) {
             hasCache = true
-          } catch (Exception e2) {
-            echo e2.toString()
           }
         }
       }

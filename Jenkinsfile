@@ -32,12 +32,10 @@ for(int i = 0; i < targets.size(); i++) {
         copyArtifacts(projectName: "dashpay-dash/${BRANCH_NAME}", selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
         hasCache = true
       } catch (Exception e) {
-        e.printStackTrace();
         try {
           copyArtifacts(projectName: 'dashpay-dash/develop', selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
           hasCache = true
         } catch (Exception e2) {
-          e2.printStackTrace();
         }
       }
 

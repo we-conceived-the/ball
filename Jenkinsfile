@@ -69,15 +69,15 @@ for(int i = 0; i < targets.size(); i++) {
             stage("${target}/depends") {
               sh './ci/build_depends.sh'
             }
-            //stage("${target}/build") {
-            //  sh './ci/build_src.sh'
-            //}
-            //stage("${target}/test") {
-            //  sh './ci/test_unittests.sh'
-            //}
-            //stage("${target}/test") {
-            //  sh './ci/test_integrationtests.sh'
-            //}
+            stage("${target}/build") {
+              sh './ci/build_src.sh'
+            }
+            stage("${target}/test") {
+              sh './ci/test_unittests.sh'
+            }
+            stage("${target}/test") {
+              sh './ci/test_integrationtests.sh'
+            }
           } finally {
             // TODO cleanup
           }

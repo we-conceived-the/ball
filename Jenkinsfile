@@ -24,7 +24,7 @@ for(int i = 0; i < targets.size(); i++) {
       def UID = sh(returnStdout: true, script: 'id -u').trim()
       def HOME = sh(returnStdout: true, script: 'echo $HOME').trim()
 
-      cache(maxCacheSize: 500, caches: [
+      cache(maxCacheSize: 1000, caches: [
            [$class: 'ArbitraryFileCache', includes: '**/*', path: "${HOME}/dash-ci-cache-${target}"]
         ]) {
         checkout scm

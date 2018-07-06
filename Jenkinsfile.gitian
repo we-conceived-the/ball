@@ -22,6 +22,7 @@ for(int i = 0; i < targets.size(); i++) {
     node {
       def pwd = sh(returnStdout: true, script: 'pwd').trim()
       def dockerGid = sh(returnStdout: true, script: "stat -c '%g' /var/run/docker.sock").trim()
+
       stage("${target}/prepare") {
         dir('dash') {
           checkout scm
@@ -45,37 +46,45 @@ for(int i = 0; i < targets.size(); i++) {
         }
       }
 
-      gitianImage.inside("--group-add ${dockerGid} -t -v \"/var/run/docker.sock:/var/run/docker.sock\"") {
-        stage("${target}/download") {
-          dir('gitian-builder') {
-            sh "mkdir -p inputs"
-            sh "cd inputs && curl -R -O ${osslPatchUrl}"
-            sh "cd inputs && curl -R -O ${osslTarUrl}"
-            sh "make -C ../dash/depends download SOURCES_PATH=`pwd`/cache/common"
+      def gitianDescriptor = readYaml file: "dash/contrib/gitian-descriptors/gitian-${target}.yml"
+      sh "echo ${gitianDescriptor.name}"
+
+      cache(maxCacheSize: 1000, caches: [
+           [$class: 'ArbitraryFileCache', includes: '**/*', path: "${pwd}/gitian-builder/cache/common"],
+           [$class: 'ArbitraryFileCache', includes: '**/*', path: "${pwd}/gitian-builder/cache/${gitianDescriptor.name}"]
+        ]) {
+        gitianImage.inside("--group-add ${dockerGid} -t -v \"/var/run/docker.sock:/var/run/docker.sock\"") {
+          stage("${target}/download") {
+            dir('gitian-builder') {
+              sh "mkdir -p inputs"
+              sh "cd inputs && curl -R -O ${osslPatchUrl}"
+              sh "cd inputs && curl -R -O ${osslTarUrl}"
+              sh "make -C ../dash/depends download SOURCES_PATH=`pwd`/cache/common"
+            }
           }
-        }
-        stage("${target}/base-vm") {
-          dir('gitian-builder') {
-            sh "./bin/make-base-vm --suite trusty --arch amd64 --docker"
-            // make sure an old version is not running
-            sh "docker rm -fv gitian-target || true"
-          }
-        }
-        stage("${target}/gbuild") {
-          dir('gitian-builder') {
-            try {
-              sh """
-                tail -F var/install.log &
-                tail -F var/build.log &
-                USE_DOCKER=1 ./bin/gbuild -j ${proc} -m ${mem} --commit dash=${commit} --url dash=${repositoryUrl} ../dash/contrib/gitian-descriptors/gitian-${target}.yml
-              """
-            } finally {
-              // make sure it doesn't run forever
+          stage("${target}/base-vm") {
+            dir('gitian-builder') {
+              sh "./bin/make-base-vm --suite trusty --arch amd64 --docker"
+              // make sure an old version is not running
               sh "docker rm -fv gitian-target || true"
             }
-            sh "mv build/out/dashcore-* ../dashcore-binaries/"
-            sh "mv build/out/src/dashcore-* ../dashcore-binaries/"
-            stash includes: '**/build/out/dashcore-*', name: target
+          }
+          stage("${target}/gbuild") {
+            dir('gitian-builder') {
+              try {
+                sh """
+                  tail -F var/install.log &
+                  tail -F var/build.log &
+                  USE_DOCKER=1 ./bin/gbuild -j ${proc} -m ${mem} --commit dash=${commit} --url dash=${repositoryUrl} ../dash/contrib/gitian-descriptors/gitian-${target}.yml
+                """
+              } finally {
+                // make sure it doesn't run forever
+                sh "docker rm -fv gitian-target || true"
+              }
+              sh "mv build/out/dashcore-* ../dashcore-binaries/"
+              sh "mv build/out/src/dashcore-* ../dashcore-binaries/"
+              stash includes: '**/build/out/dashcore-*', name: target
+            }
           }
         }
       }

@@ -23,10 +23,9 @@ for(int i = 0; i < targets.size(); i++) {
       def BUILD_NUMBER = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
       def UID = sh(returnStdout: true, script: 'id -u').trim()
       def HOME = sh(returnStdout: true, script: 'echo $HOME').trim()
+      def pwd = sh(returnStdout: true, script: 'pwd').trim()
 
       checkout scm
-
-      def pwd = sh(returnStdout: true, script: 'pwd').trim()
 
       def hasCache = false
       try {

@@ -7,11 +7,11 @@
 def targets = [
   'win32',
   'win64',
-  //'linux32',
-  //'linux64',
-  //'linux64_nowallet',
-  //'linux64_release',
-  //'mac',
+  'linux32',
+  'linux64',
+  'linux64_nowallet',
+  'linux64_release',
+  'mac',
 ]
 
 def tasks = [:]

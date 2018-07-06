@@ -21,6 +21,7 @@ for(int i = 0; i < targets.size(); i++) {
   tasks["${target}"] = {
     node {
       def BUILD_NUMBER = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
+      def BRANCH_NAME = sh(returnStdout: true, script: 'echo $BRANCH_NAME').trim()
       def UID = sh(returnStdout: true, script: 'id -u').trim()
       def HOME = sh(returnStdout: true, script: 'echo $HOME').trim()
       def pwd = sh(returnStdout: true, script: 'pwd').trim()
@@ -32,10 +33,19 @@ for(int i = 0; i < targets.size(); i++) {
         copyArtifacts(projectName: "dashpay-dash/${BRANCH_NAME}", selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
         hasCache = true
       } catch (Exception e) {
+        def sw = new StringWriter()
+        def pw = new PrintWriter(sw)
+        e.printStackTrace(pw)
+        echo sw.toString()
+
         try {
           copyArtifacts(projectName: 'dashpay-dash/develop', selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
           hasCache = true
         } catch (Exception e2) {
+          def sw2 = new StringWriter()
+          def pw2 = new PrintWriter(sw2)
+          e2.printStackTrace(pw2)
+          echo sw2.toString()
         }
       }
 

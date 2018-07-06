@@ -10,8 +10,8 @@ unset CC; unset CXX
 unset DISPLAY
 
 set +e
-ls -lah /cache
-ls -lah /cache/ccache
+ls -lah $CACHE_DIR
+ls -lah $CACHE_DIR/ccache
 set -e
 
 mkdir -p $CACHE_DIR/depends

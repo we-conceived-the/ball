@@ -60,11 +60,7 @@ for(int i = 0; i < targets.size(); i++) {
         sh "ls -lah"
         sh "ls -lah ci-cache-${target} || true"
 
-        builderImage.inside("-u root -t -v \"${pwd}/ci-cache-${target}:/cache\"") {
-          sh "chown dash:dash /cache"
-        }
-
-        builderImage.inside("-t -v \"${pwd}/ci-cache-${target}:/cache\"") {
+        builderImage.inside("-t") {
           try {
             stage("${target}/depends") {
               sh './ci/build_depends.sh'

@@ -13,8 +13,8 @@ export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
 export CCACHE_SIZE=${CCACHE_SIZE:-400M}
 
 set +e
-ls -lah /cache
-ls -lah /cache/ccache
+ls -lah $CACHE_DIR
+ls -lah $CACHE_DIR/ccache
 set -e
 
 #if [ "$CHECK_DOC" = 1 ]; then contrib/devtools/check-doc.py; fi TODO reenable after all Bitcoin PRs have been merged and docs fully fixed
@@ -42,6 +42,6 @@ cd dashcore-$BUILD_TARGET
 make $MAKEJOBS $GOAL || ( echo "Build failure. Verbose build follows." && make $GOAL V=1 ; false )
 
 set +e
-ls -lah /cache
-ls -lah /cache/ccache
+ls -lah $CACHE_DIR
+ls -lah $CACHE_DIR/ccache
 set -e

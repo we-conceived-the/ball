@@ -47,7 +47,6 @@ for(int i = 0; i < targets.size(); i++) {
       }
 
       def gitianDescriptor = readYaml file: "dash/contrib/gitian-descriptors/gitian-${target}.yml"
-      sh "echo ${gitianDescriptor.name}"
 
       cache(maxCacheSize: 1000, caches: [
            [$class: 'ArbitraryFileCache', includes: '**/*', path: "${pwd}/gitian-builder/cache/common"],

@@ -23,9 +23,10 @@ for(int i = 0; i < targets.size(); i++) {
       def BUILD_NUMBER = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
       def UID = sh(returnStdout: true, script: 'id -u').trim()
       def HOME = sh(returnStdout: true, script: 'echo $HOME').trim()
-      def pwd = sh(returnStdout: true, script: 'pwd').trim()
 
       checkout scm
+
+      def pwd = sh(returnStdout: true, script: 'pwd').trim()
 
       def hasCache = false
       try {
@@ -52,10 +53,13 @@ for(int i = 0; i < targets.size(); i++) {
           builderImage = docker.build("${builderImageName}", "--build-arg BUILD_TARGET=${target} ci -f ci/Dockerfile.builder")
         }
 
-        sh "mkdir -p ci-cache-${target}"
         if (hasCache) {
-          sh "tar xzfv ci-cache-${target}.tar.gz"
+          sh "cd ${pwd} && tar xzfv ci-cache-${target}.tar.gz"
+        } else {
+          sh "mkdir -p ${pwd}/ci-cache-${target}"
         }
+        sh "ls -lah"
+        sh "ls -lah ci-cache-${target} || true"
 
         builderImage.inside("-u root -t -v \"${pwd}/ci-cache-${target}:/cache\"") {
           sh "chown dash:dash /cache"
@@ -79,6 +83,8 @@ for(int i = 0; i < targets.size(); i++) {
             // TODO cleanup
           }
         }
+        sh "ls -lah"
+        sh "ls -lah ci-cache-${target} || true"
         sh "tar czfv ci-cache-${target}.tar.gz ci-cache-${target}"
         archiveArtifacts artifacts: "ci-cache-${target}.tar.gz", fingerprint: true
       }

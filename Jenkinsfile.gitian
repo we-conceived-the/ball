@@ -22,6 +22,8 @@ for(int i = 0; i < targets.size(); i++) {
     node {
       def pwd = sh(returnStdout: true, script: 'pwd').trim()
       def dockerGid = sh(returnStdout: true, script: "stat -c '%g' /var/run/docker.sock").trim()
+      def BRANCH_NAME = sh(returnStdout: true, script: 'echo $BRANCH_NAME').trim()
+      def hasCache = false
 
       stage("${target}/prepare") {
         dir('dash') {
@@ -37,6 +39,18 @@ for(int i = 0; i < targets.size(); i++) {
             sh "curl --location --fail $SDK_URL/MacOSX${OSX_SDK}.sdk.tar.gz -o inputs/MacOSX${OSX_SDK}.sdk.tar.gz"
           }
         }
+
+        // restore cache
+        try {
+          copyArtifacts(projectName: "dashpay-dash-gitian-nightly/${BRANCH_NAME}", selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
+          hasCache = true
+        } catch (Exception e) {
+          try {
+            copyArtifacts(projectName: 'dashpay-dash-gitian-nightly/develop', selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
+            hasCache = true
+          } catch (Exception e2) {
+          }
+        }
       }
 
       def gitianImage
@@ -47,19 +61,6 @@ for(int i = 0; i < targets.size(); i++) {
       }
 
       def gitianDescriptor = readYaml file: "dash/contrib/gitian-descriptors/gitian-${target}.yml"
-
-      // restore cache
-      def hasCache = false
-      try {
-        copyArtifacts(projectName: "dashpay-dash-gitian-nightly/${BRANCH_NAME}", selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
-        hasCache = true
-      } catch (Exception e) {
-        try {
-          copyArtifacts(projectName: 'dashpay-dash-gitian-nightly/develop', selector: lastSuccessful(), filter: "cache-${gitianDescriptor.name}.tar.gz");
-          hasCache = true
-        } catch (Exception e2) {
-        }
-      }
 
       gitianImage.inside("--group-add ${dockerGid} -t -v \"/var/run/docker.sock:/var/run/docker.sock\"") {
         if (hasCache) {

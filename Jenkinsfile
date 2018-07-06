@@ -30,13 +30,13 @@ for(int i = 0; i < targets.size(); i++) {
 
       def hasCache = false
       try {
-        copyArtifacts(projectName: "dashpay-dash/${BRANCH_NAME}", selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
+        copyArtifacts(projectName: "dashpay-dash/${BRANCH_NAME}", selector: lastSuccessful(), filter: "ci-cache-${target}.tar.gz");
         hasCache = true
       } catch (Exception e) {
         echo e.toString()
 
         try {
-          copyArtifacts(projectName: 'dashpay-dash/develop', selector: lastSuccessful, filter: "ci-cache-${target}.tar.gz");
+          copyArtifacts(projectName: 'dashpay-dash/develop', selector: lastSuccessful(), filter: "ci-cache-${target}.tar.gz");
           hasCache = true
         } catch (Exception e2) {
           echo e2.toString()

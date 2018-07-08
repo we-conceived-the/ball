@@ -1,15 +1,15 @@
 [Unit]
-Description=Dash's distributed currency daemon
+Description=Ball's distributed currency daemon
 After=network.target
 
 [Service]
-User=dashcore
-Group=dashcore
+User=ballcore
+Group=ballcore
 
 Type=forking
-PIDFile=/var/lib/dashd/dashd.pid
-ExecStart=/usr/bin/dashd -daemon -pid=/var/lib/dashd/dashd.pid \
--conf=/etc/dashcore/dash.conf -datadir=/var/lib/dashd -disablewallet
+PIDFile=/var/lib/balld/balld.pid
+ExecStart=/usr/bin/balld -daemon -pid=/var/lib/balld/balld.pid \
+-conf=/etc/ballcore/ball.conf -datadir=/var/lib/balld -disablewallet
 
 Restart=always
 PrivateTmp=true

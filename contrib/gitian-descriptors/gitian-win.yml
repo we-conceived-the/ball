@@ -22,7 +22,7 @@ packages:
 - "ca-certificates"
 - "python"
 remotes:
-- "url": "https://we-conceived-the/ball.git"
+- "url": "https://github.com/we-conceived-the/ball.git"
   "dir": "ball"
 files: []
 script: |
